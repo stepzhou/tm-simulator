@@ -13,21 +13,21 @@ automate the process than when I'm no longer a intro to CS TA?
 Usage
 -----
 
-# Input
+### Input
 
 The turing machine instructions should be in a text file with the following
 format:
 
     TO BE DECIDED
 
-# Test cases
+### Test cases
 
 Put your test cases in another text file, newline delimited.
 
-# Run
+### Run
 
     python tm-simulator.py {instructions} {test-cases}
 
-# Output
+### Output
 
 
