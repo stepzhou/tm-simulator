@@ -46,6 +46,11 @@ class Tape(object):
         self.tape[self.pointer] = x
 
     def move(self, direction):
+        """
+        Moves along the tape left or right. 
+        
+        Grows a buffer on the left to reduce the number of list copies required
+        """
         if self.pointer == self.left and direction == -1:
             print self.tape
             if self.pointer == 0:
@@ -82,6 +87,9 @@ class TMSimulator(object):
         self.start_state = start_state
 
     def load_tape(self, tape_str):
+        """
+        Loads a tape into the TM config
+        """
         self.tape = Tape(tape_str)
         self.cur_state = self.start_state
 
@@ -105,23 +113,36 @@ class TMSimulator(object):
         else:
             raise TMHalt()
 
-    def run(self):
+    def run(self, verbose = False):
         """
         Runs until the TM halts
         """
+        # prints verbosely if flag is enabled
+        if verbose:
+            def verboseprint(*args):
+                for arg in args:
+                    print arg,
+                print
+        else:
+            verboseprint = lambda *a: None
+
+        print "START: {}".format(self.tape)
         try:
             while 1:
                 self.step()
-                print self.tape
+                verboseprint(self.tape)
         except TMHalt:
             print "TM halted"
+            print "END: {}".format(self.tape)
 
 
 class AmbiguousStateError(Exception):
     pass
 
+
 class InputError(Exception):
     pass
+
 
 class TMHalt(Exception):
     pass
@@ -172,8 +193,10 @@ def get_tapes(raw_tapes):
 
 
 if __name__ == "__main__":
-    # if len(sys.argv) != 3:
-    #     sys.exit(2)
+    # TODO: argparse!
+    if len(sys.argv) != 3:
+        print "Check CL args"
+        sys.exit(2)
 
     try:
         with open(sys.argv[1]) as f:
@@ -183,8 +206,9 @@ if __name__ == "__main__":
         with open(sys.argv[2]) as f:
             tapes = get_tapes(f.read())
 
-        tm.load_tape(tapes[0])
-        tm.run()
+        for t in tapes:
+            tm.load_tape(t)
+            tm.run()
     except AmbiguousStateError as detail:
         print detail
     except InputError as detail:
