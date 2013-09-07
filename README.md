@@ -36,4 +36,6 @@ Todo
 ----
 
 1. Make TMSimulator.run return a sane output rather than just printing
+2. Separate classes into separate files
+3. Let user set max step # to avoid infinite loop
 

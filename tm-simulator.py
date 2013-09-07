@@ -10,8 +10,6 @@ class State(object):
     """
 
     def __init__(self, state_id):
-        """
-        """
         self.state_id = state_id 
         self.reachable = False
         self.next_states = {}
@@ -53,7 +51,6 @@ class Tape(object):
         Grows a buffer on the left to reduce the number of list copies required
         """
         if self.pointer == self.left and direction == -1:
-            print self.tape
             if self.pointer == 0:
                 self.tape = self.__grow_left(self.tape)
                 self.pointer = self.left
