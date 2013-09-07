@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import argparse
 
@@ -6,7 +8,7 @@ from collections import namedtuple
 
 class State(object):
     """
-    A representation of a TM instruction
+    A representation of a TM state
     """
 
     def __init__(self, state_id):
@@ -16,6 +18,8 @@ class State(object):
         self.instructions = {}
 
     def __repr__(self):
+        """Temp repr for debugging purposes"""
+        # TODO: Clean up
         s = "State: " + self.state_id + "\n"
         s += "Instructions:\n"
         for i in self.instructions.items():
@@ -39,16 +43,20 @@ class Tape(object):
         self.pointer = self.left
 
     def get_cur_symbol(self):
+        """Returns the tape's current symbol"""
         return self.tape[self.pointer]
 
     def replace(self, x):
+        """Replaces the current tape symbol with x"""
         self.tape[self.pointer] = x
 
     def move(self, direction):
-        """
-        Moves along the tape left or right. 
+        """Moves along the tape left or right. 
         
         Grows a buffer on the left to reduce the number of list copies required
+
+        Args:
+            direction: direction of tape movement. 1 for right, -1 for left.
         """
         if self.pointer == self.left and direction == -1:
             if self.pointer == 0:
@@ -64,6 +72,16 @@ class Tape(object):
             self.pointer += direction
 
     def __grow_left(self, li):
+        """Grows the buffer on the left
+        
+        Buffer size increases by 2x
+
+        Args:
+            li: list that will be grown left
+
+        Returns:
+            List that has a grown left
+        """
         li = [None] * self.left_buf_size + li
         self.left_buf_size *= 2
         self.left = self.left_buf_size
@@ -85,16 +103,19 @@ class TMSimulator(object):
         self.start_state = start_state
 
     def load_tape(self, tape_str):
-        """
-        Loads a tape into the TM config
+        """Loads a tape into the TM config
+
+        Args:
+            tape_str: string of a tape
+
+        Raises:
+            TMHalt: Current state does not have any transitions
         """
         self.tape = Tape(tape_str)
         self.cur_state = self.start_state
 
     def step(self):
-        """
-        Takes one step into the TM sim
-        """
+        """Takes one step into the TM sim"""
         tape_sym = self.tape.get_cur_symbol()
         instr = self.cur_state.instructions.get(tape_sym)
         if instr is not None:
@@ -112,8 +133,10 @@ class TMSimulator(object):
             raise TMHalt()
 
     def run(self, verbose=False):
-        """
-        Runs until the TM halts
+        """Runs until the TM halts
+
+        Args:
+            verbose: flag that indicates whether verbose print is turned on or off
         """
         # prints verbosely if flag is enabled
         if verbose:
@@ -150,6 +173,18 @@ class TMHalt(Exception):
 
 
 def parse_instructions(raw_instructions):
+    """Parses a string of TM instructions and constructs the TM states
+
+    Args:
+        raw_instructions: string of TM instructions
+
+    Returns:
+        The starting state of the TM
+
+    Raises:
+        AmbiguousStateError: A state has two or more of the same tape symbol
+            input
+    """
     Instruction = namedtuple('Instruction', ['state', 
                                              'tape', 
                                              'write',
@@ -164,9 +199,9 @@ def parse_instructions(raw_instructions):
                                         write = i[2],
                                         direction = i[3],
                                         next = i[4]))
-    state_table = {}
 
     # first pass for constructing states
+    state_table = {}
     for i in instructions:
         if i.state not in state_table:
             state_table[i.state] = State(i.state)
@@ -186,10 +221,19 @@ def parse_instructions(raw_instructions):
         state.next_states[i.next] = next_state
 
     # default start state is 1
+    # TODO: start state depends on user-input
     return state_table['1']
 
 
 def get_tapes(raw_tapes):
+    """Converts a string of many tapes into an array of tapes
+
+    Args:
+        raw_tapes: string of many tapes
+
+    Returns:
+        An array of tapes
+    """
     return [x.strip() for x in raw_tapes.strip().split('\n')]
 
 
@@ -200,8 +244,6 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbosity", action="store_true",
                         help="increase step verbosity")
     args = parser.parse_args()
-
-    print args
 
     try:
         with open(args.instructions) as f:
@@ -215,7 +257,5 @@ if __name__ == "__main__":
             tm.load_tape(t)
             tm.run(verbose=args.verbosity)
             print
-    except AmbiguousStateError as detail:
-        print detail
-    except InputError as detail:
-        print detail
+    except (AmbiguousStateError, InputError) as e:
+        print repr(e)
