@@ -4,11 +4,8 @@ Turing Machine Simulator
 What and why?
 -------------
 
-A small program for simulating a turing machine. 
-
-I've always wanted to develop this when I was a TA for intro to CS given how
-annoying it was to grade the turing machine problems. So what better time to
-automate the process than when I'm no longer a intro to CS TA?
+A small program for simulating a turing machine, mostly because I've been
+wanting to write one for a while now.
 
 Usage
 -----
@@ -20,8 +17,13 @@ the following format:
 
     {state} {tape-sym} {write-sym} {direction} {next-state}
 
-Direction is either 'l' for left or 'r' for right. Blank symbol is '\_'. Other
-elements can be any arbitrary string.
+Direction is either 'l' for left or 'r' for right. 
+
+Blank symbol is '\_'. 
+
+Other elements can be any arbitrary string.
+
+The default start state is state 1.
 
 ### Test cases
 
@@ -49,4 +51,6 @@ Todo
 3. Let user set max step # to avoid infinite loop
 4. Gui for visualizing states and transitions
 5. Commenting for input files
+6. Reachable exception
+7. Visualize where the tape pointer is
 
