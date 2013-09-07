@@ -15,10 +15,10 @@ Usage
 
 ### Input
 
-The turing machine instructions should be in a text file with the following
-format:
+The turing machine instructions should be in a newline-delimited text file with
+the following format:
 
-    TO BE DECIDED
+    {state} {tape-sym} {write-sym} {direction} {next-state}
 
 ### Test cases
 
@@ -30,4 +30,10 @@ Put your test cases in another text file, newline delimited.
 
 ### Output
 
+Final output TBD
+
+Todo
+----
+
+1. Make TMSimulator.run return a sane output rather than just printing
 

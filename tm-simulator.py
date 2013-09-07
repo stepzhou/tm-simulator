@@ -1,4 +1,5 @@
 import sys
+import argparse
 
 from collections import namedtuple
 
@@ -113,7 +114,7 @@ class TMSimulator(object):
         else:
             raise TMHalt()
 
-    def run(self, verbose = False):
+    def run(self, verbose=False):
         """
         Runs until the TM halts
         """
@@ -124,16 +125,19 @@ class TMSimulator(object):
                     print arg,
                 print
         else:
+            # Empty function
             verboseprint = lambda *a: None
 
-        print "START: {}".format(self.tape)
+        s = "{:10}: {}"
+        print s.format("START", self.tape)
         try:
+            step = 1
             while 1:
                 self.step()
-                verboseprint(self.tape)
+                verboseprint(s.format("STEP" + str(step), self.tape))
+                step += 1
         except TMHalt:
-            print "TM halted"
-            print "END: {}".format(self.tape)
+            print s.format("END", self.tape)
 
 
 class AmbiguousStateError(Exception):
@@ -193,22 +197,27 @@ def get_tapes(raw_tapes):
 
 
 if __name__ == "__main__":
-    # TODO: argparse!
-    if len(sys.argv) != 3:
-        print "Check CL args"
-        sys.exit(2)
+    parser = argparse.ArgumentParser(description="TM simulator")
+    parser.add_argument("instructions", help="text file of TM instructions")
+    parser.add_argument("test_cases", help="text file of test cases")
+    parser.add_argument("-v", "--verbosity", action="store_true",
+                        help="increase step verbosity")
+    args = parser.parse_args()
+
+    print args
 
     try:
-        with open(sys.argv[1]) as f:
+        with open(args.instructions) as f:
             start_state = parse_instructions(f.read())
             tm = TMSimulator(start_state)
 
-        with open(sys.argv[2]) as f:
+        with open(args.test_cases) as f:
             tapes = get_tapes(f.read())
 
         for t in tapes:
             tm.load_tape(t)
-            tm.run()
+            tm.run(verbose=args.verbosity)
+            print
     except AmbiguousStateError as detail:
         print detail
     except InputError as detail:
