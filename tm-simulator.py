@@ -149,15 +149,15 @@ class TMSimulator(object):
             verboseprint = lambda *a: None
 
         s = "{:10}: {}"
+        step = 1
         print s.format("START", self.tape)
         try:
-            step = 1
             while 1:
                 self.step()
                 verboseprint(s.format("STEP" + str(step), self.tape))
                 step += 1
         except TMHalt:
-            print s.format("END", self.tape)
+            print s.format("STEP" + str(step), self.tape)
 
 
 class AmbiguousStateError(Exception):
