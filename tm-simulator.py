@@ -150,14 +150,20 @@ class TMSimulator(object):
 
         s = "{:10}: {}"
         step = 1
-        print s.format("START", self.tape)
+        print self.__tape_string("START", self.tape)
         try:
             while 1:
                 self.step()
-                verboseprint(s.format("STEP" + str(step), self.tape))
+                verboseprint(self.__tape_string("STEP" + str(step), self.tape))
                 step += 1
         except TMHalt:
-            print s.format("STEP" + str(step), self.tape)
+            print self.__tape_string("STEP" + str(step), self.tape)
+
+    @staticmethod
+    def __tape_string(label, tape):
+        s = "{:10}{} {}"
+        return (s.format(label, ":",  tape) + "\n" + 
+                s.format("", " ", " " * (tape.pointer - tape.left) + "^"))
 
 
 class AmbiguousStateError(Exception):

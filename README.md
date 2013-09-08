@@ -33,7 +33,7 @@ Put your test cases in another text file, newline delimited.
 
     python tm-simulator.py {instructions} {test-cases}
 
-See test\_instructions.txt and test\_tapes.txt for sample input.
+See the tests/ folder for sample inputs
 
 For more options, run
 
