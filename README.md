@@ -31,13 +31,13 @@ Put your test cases in another text file, newline delimited.
 
 ### Sample Run
 
-    python tm-simulator.py {instructions} {test-cases}
+    python tm_simulator.py {instructions} {test-cases}
 
 See the tests/ folder for sample inputs
 
 For more options, run
 
-    python tm-simulator.py -h
+    python tm_simulator.py -h
 
 ### Output
 

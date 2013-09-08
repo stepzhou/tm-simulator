@@ -42,7 +42,12 @@ class Tape(object):
         self.left = self.left_buf_size
         self.pointer = self.left
 
-    def get_cur_symbol(self):
+    def __str__(self):
+        # splice is so inefficient D:
+        return ''.join(self.tape[self.left:])
+
+    @property
+    def current_symbol(self):
         """Returns the tape's current symbol"""
         return self.tape[self.pointer]
 
@@ -87,10 +92,6 @@ class Tape(object):
         self.left = self.left_buf_size
         return li
 
-    def __str__(self):
-        # splice is so inefficient D:
-        return ''.join(self.tape[self.left:])
-
 
 class TMSimulator(object):
     """
@@ -116,7 +117,7 @@ class TMSimulator(object):
 
     def step(self):
         """Takes one step into the TM sim"""
-        tape_sym = self.tape.get_cur_symbol()
+        tape_sym = self.tape.current_symbol
         instr = self.cur_state.instructions.get(tape_sym)
         if instr is not None:
             self.tape.replace(instr.write)
@@ -148,7 +149,6 @@ class TMSimulator(object):
             # Empty function
             verboseprint = lambda *a: None
 
-        s = "{:10}: {}"
         step = 1
         print self.__tape_string("START", self.tape)
         try:
