@@ -12,6 +12,13 @@ class State(object):
     """
 
     def __init__(self, state_id):
+        """Constructs a state
+
+        next_states: key is a state_id, val is a reference to the state that
+            the current state can transition to
+        instructions: key is tape symbol, val is an Instruction namedtuple 
+            with all the information pertaining to the tape symbol input
+        """
         self.state_id = state_id 
         self.reachable = False
         self.next_states = {}
@@ -37,6 +44,7 @@ class Tape(object):
     _blank = _blanks[0]
 
     def __init__(self, s):
+        """Constructs a TM tape"""
         self.left_buf_size = 10
         self.tape = [None] * self.left_buf_size +  list(s)
         self.left = self.left_buf_size
@@ -50,6 +58,10 @@ class Tape(object):
     def current_symbol(self):
         """Returns the tape's current symbol"""
         return self.tape[self.pointer]
+    
+    @property
+    def adjusted_pointer(self):
+        return self.pointer - self.left
 
     def replace(self, x):
         """Replaces the current tape symbol with x"""
@@ -97,6 +109,7 @@ class TMSimulator(object):
     """
     Simulates a TM
     """
+
     _left = 'l'
     _right = 'r'
 
@@ -163,7 +176,7 @@ class TMSimulator(object):
     def __tape_string(label, tape):
         s = "{:10}{} {}"
         return (s.format(label, ":",  tape) + "\n" + 
-                s.format("", " ", " " * (tape.pointer - tape.left) + "^"))
+                s.format("", " ", " " * tape.adjusted_pointer + "^"))
 
 
 class AmbiguousStateError(Exception):
