@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 
+"""
+Turing Machine simulator
+"""
+
 import sys
 import argparse
 
 from collections import namedtuple
+
+__author__ = "Stephen Zhou"
+__license__ = "MIT"
+__version__ = "1.0.0"
 
 
 class State(object):
@@ -24,8 +32,8 @@ class State(object):
         self.next_states = {}
         self.instructions = {}
 
-    def __repr__(self):
-        """Temp repr for debugging purposes"""
+    def __str__(self):
+        """Temp str for debugging purposes"""
         # TODO: Clean up
         s = "State: " + self.state_id + "\n"
         s += "Instructions:\n"
@@ -48,7 +56,7 @@ class Tape(object):
         self.left_buf_size = 10
         self.tape = [None] * self.left_buf_size +  list(s)
         self.left = self.left_buf_size
-        self.pointer = self.left
+        self._pointer = self.left
 
     def __str__(self):
         # splice is so inefficient D:
@@ -57,15 +65,21 @@ class Tape(object):
     @property
     def current_symbol(self):
         """Returns the tape's current symbol"""
-        return self.tape[self.pointer]
+        return self.tape[self._pointer]
     
     @property
-    def adjusted_pointer(self):
-        return self.pointer - self.left
+    def pointer(self):
+        """Returns the pointer relative to the tape, buffer not included"""
+        return self._pointer - self.left
+
+    @property
+    def stripped(self):
+        """Returns the tape without trailing and leading blanks"""
+        return self.__str__().strip('_')
 
     def replace(self, x):
         """Replaces the current tape symbol with x"""
-        self.tape[self.pointer] = x
+        self.tape[self._pointer] = x
 
     def move(self, direction):
         """Moves along the tape left or right. 
@@ -75,20 +89,20 @@ class Tape(object):
         Args:
             direction: direction of tape movement. 1 for right, -1 for left.
         """
-        if self.pointer == self.left and direction == -1:
-            if self.pointer == 0:
-                self.tape = self.__grow_left(self.tape)
-                self.pointer = self.left
-            self.pointer -= 1
-            self.tape[self.pointer] = self._blank
+        if self._pointer == self.left and direction == -1:
+            if self._pointer == 0:
+                self.tape = self._grow_left(self.tape)
+                self._pointer = self.left
+            self._pointer -= 1
+            self.tape[self._pointer] = self._blank
             self.left -= 1
-        elif self.pointer == len(self.tape) - 1 and direction == 1:
-            self.pointer += 1
+        elif self._pointer == len(self.tape) - 1 and direction == 1:
+            self._pointer += 1
             self.tape.append(self._blank)
         else:
-            self.pointer += direction
+            self._pointer += direction
 
-    def __grow_left(self, li):
+    def _grow_left(self, li):
         """Grows the buffer on the left
         
         Buffer size increases by 2x
@@ -129,7 +143,11 @@ class TMSimulator(object):
         self.cur_state = self.start_state
 
     def step(self):
-        """Takes one step into the TM sim"""
+        """Takes one step into the TM sim
+        
+        Raises:
+            InputError: direction in put is not valid
+        """
         tape_sym = self.tape.current_symbol
         instr = self.cur_state.instructions.get(tape_sym)
         if instr is not None:
@@ -163,20 +181,20 @@ class TMSimulator(object):
             verboseprint = lambda *a: None
 
         step = 1
-        print self.__tape_string("START", self.tape)
+        print self._tape_string("START", self.tape)
         try:
             while 1:
                 self.step()
-                verboseprint(self.__tape_string("STEP" + str(step), self.tape))
+                verboseprint(self._tape_string("STEP" + str(step), self.tape))
                 step += 1
         except TMHalt:
-            print self.__tape_string("STEP" + str(step), self.tape)
+            print self._tape_string("STEP" + str(step), self.tape)
 
     @staticmethod
-    def __tape_string(label, tape):
+    def _tape_string(label, tape):
         s = "{:10}{} {}"
         return (s.format(label, ":",  tape) + "\n" + 
-                s.format("", " ", " " * tape.adjusted_pointer + "^"))
+                s.format("", " ", " " * tape.pointer + "^"))
 
 
 class AmbiguousStateError(Exception):

@@ -17,9 +17,9 @@ the following format:
 
     {state} {tape-sym} {write-sym} {direction} {next-state}
 
-Direction is either 'l' for left or 'r' for right. 
+Direction is either `l` for left or `r` for right. 
 
-Blank symbol is '\_'. 
+Blank symbol is `_`. 
 
 Other elements can be any arbitrary string.
 
@@ -41,7 +41,8 @@ For more options, run
 
 ### Output
 
-Final output TBD
+Final output TBD. Currently just prints, but should instead return a DS to make
+simpler to build on top of it, e.g. GUI, shell, etc.
 
 Todo
 ----
@@ -50,7 +51,7 @@ Todo
 2. Separate classes into separate files for organization
 3. Let user set max step # to avoid infinite loop
 4. Gui for visualizing states and transitions
+5. Shell for loading instructions and testing tapes
 5. Commenting for input files
 6. Reachable exception
-7. Visualize where the tape pointer is
 
